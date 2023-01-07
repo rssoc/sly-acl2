@@ -1,3 +1,7 @@
+;;; acl2.asd -- An ad-hoc ASDF system for ACL2 that is solely for
+;;; convenience and book-keeping. This will be replaced. Expects to
+;;; find ACL2 cloned under QL:*LOCAL-PROJECT-DIRECTORIES*
+;;;
 (in-package :asdf-user)
 
 (defun find-acl2-installation-directory ()
@@ -18,16 +22,26 @@
 
 (defun build-acl2-fasl ()
   (unless (packagep (find-package "ACL2"))
-    (with-current-directory (#.(find-acl2-installation-directory))
+    (with-current-directory ((find-acl2-installation-directory))
       (let ((*real-standard-output* *standard-output*))
         (with-open-stream (*standard-output* (make-broadcast-stream))
           (format
            *real-standard-output*
            "; Loading \"ACL2\"~%")
+          (when (ql-impl-util:probe-directory #P"./books/quicklisp/bundle")
+            (format *real-standard-output*
+                "~%WARNING: ACL2 bundles itself with outdated ASDF systems of popular ~
+                   ~%         libraries (such as bordaux-threads!). Thus once ACL2 ~
+                   ~%         is placed in a place visible to ASDF (and QL), ~
+                   ~%         outdated libraries might be loaded! Therefore, it's ~
+                   ~%         encouraged to delete the following directory if you ~
+                   ~%         have no plans on using it! ~
+                   ~%         ~A~%~%"
+                (ql-impl-util:probe-directory #P"./books/quicklisp/bundle")))
           (load "init.lisp")
           (format
            *real-standard-output*
-           ";   Compiling ACL2 (this will take a few seconds)...~%")
+           ";   Compiling ACL2 (this may take a few seconds)...~%")
           (funcall (find-symbol "COMPILE-ACL2" "ACL2"))
           (format
            *real-standard-output*
@@ -35,14 +49,12 @@
           (funcall (find-symbol "LOAD-ACL2" "ACL2"))
           (format
            *real-standard-output*
-           ";   Initializing ACL2 (this may take 1-2 minutes)... Make some tea.~%")
+           ";   Bootstrapping ACL2's world (this will take 1-2 minutes)... Make some tea.~%")
           (funcall (find-symbol "INITIALIZE-ACL2" "ACL2"))
           (format
            *real-standard-output*
-           "; HINT: Use a pre-dumped image next time to speed up the process~%")
-          (format
-           *real-standard-output*
-           ";       (until we have a proper ASDF system definition).~%")))
+           "; HINT: Use a pre-dumped image next time to speed up the process,~
+           ~%       this is until we have a proper ASDF system.~%")))
       nil)))
 
 (defsystem :acl2
