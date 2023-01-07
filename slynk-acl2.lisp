@@ -14,13 +14,7 @@
 ;;; the host lisp, or by ACL2 (see `acl2-expression-p' for the
 ;;; criteria that determines this). If an ACL2 form was read, a
 ;;; lisp-object is read in w.r.t. ACL2::*ACL2-READTABLE*, and the read
-;;; function returns multiple-values! The first value is the
-;;; lisp-object itself, the second value is always T. We are just
-;;; abusing multiple-values here as a transparent tagging mechanism,
-;;; since we need to let EVAL know that it's evaluating an ACL2 form,
-;;; but don't want to disturb the return type of read (so things such
-;;; as (car (read ...)) still work, and rightfully revoke the ACL2
-;;; status of such expressions).
+;;; function returns that lisp-object.
 ;;;
 ;;; Then, if EVAL tries to evaluate an ACL2 expression, it's handed
 ;;; off to ACL2::LD-FN for evaluation, and returns the result of that
@@ -54,8 +48,8 @@ by the host lisp; no matter the context.")
           :test #'string-equal))
 
 
-;;; TODO: Should I be using ACL2::STATE or ACL2::*THE-LIVE-STATE*?
-;;; (There's also ACL2::STATE-STATE)!
+;;; TODO: Figure out if I should be using ACL2::STATE or
+;;; ACL2::*THE-LIVE-STATE*. (There's also ACL2::STATE-STATE)!
 
 (defun list-acl2-packages ()
   "Returns a list of packages defined in ACL2's namespace."
@@ -80,7 +74,7 @@ by the host lisp; no matter the context.")
     (or (acl2-package? (symbol-package symbol))
         ;; Although it appears as a COMMON-LISP symbol to us, in
         ;; reality they are special to ACL2. This fake appearance is
-        ;; somewhat annoying as it can causes some unexpected
+        ;; somewhat annoying as it can cause some unexpected
         ;; results. Later, I will want to fix this through the reader
         ;; (if a COMMON-LISP symbol was explicitly qualified as an
         ;; ACL2 symbol, keep it as such).
@@ -102,7 +96,6 @@ by the host lisp; no matter the context.")
         ;; on SBCL 2.2.10).
         (t nil)))
 
-
 (defun acl2-last-input-expression ()
   "Returns the last input expression sent to ACL2."
   acl2::(ld-history-entry-input
@@ -123,7 +116,6 @@ by the host lisp; no matter the context.")
            (first (ld-history state))))))
 
 
-
 (defun maybe-initialize-acl2 ()
   acl2::(when (not *lp-ever-entered-p*)
           ;; NOTE: in the future we can use this to set the IO to w/e
@@ -160,7 +152,6 @@ by the host lisp; no matter the context.")
     (apply #'cl:read-from-string string reader-options)))
 
 
-
 (defun stream-to-string (stream)
   "Turn STREAM into a string object. Destructively modifies STREAM by
 repeatably calling READ-LINE on it."
@@ -202,7 +193,7 @@ repeatably calling READ-LINE on it."
       (cl:eval original-exp)))
 
 
-
+;; Install ourselves into the :slynk and :slynk-mrepl packages.
 (shadowing-import
  '(eval read read-from-string)
  :slynk)
