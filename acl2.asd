@@ -23,7 +23,7 @@
         (with-open-stream (*standard-output* (make-broadcast-stream))
           (format
            *real-standard-output*
-           "; Loading system ACL2...~%")
+           "; Loading \"ACL2\"~%")
           (load "init.lisp")
           (format
            *real-standard-output*
@@ -35,17 +35,17 @@
           (funcall (find-symbol "LOAD-ACL2" "ACL2"))
           (format
            *real-standard-output*
-           ";   Initializing ACL2 (this may take 1-2 minutes)...~%")
+           ";   Initializing ACL2 (this may take 1-2 minutes)... Make some tea.~%")
+          (funcall (find-symbol "INITIALIZE-ACL2" "ACL2"))
           (format
            *real-standard-output*
            "; HINT: Use a pre-dumped image next time to speed up the process~%")
           (format
            *real-standard-output*
-           ";       (at least until we have a proper ASDF system definition).")
-          (funcall (find-symbol "INITIALIZE-ACL2" "ACL2"))))
+           ";       (until we have a proper ASDF system definition).~%")))
       nil)))
 
 (defsystem :acl2
   :class :precompiled-system
   :description "ACL2 ASDF-system signature. (It's a dummy)."
-  :fasl #.(load-acl2-fasl))
+  :fasl #.(build-acl2-fasl))
