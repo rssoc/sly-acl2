@@ -1,0 +1,29 @@
+#+TITLE:  ACL2 support for Sly
+A Sly extension that adds support for the ACL2 automated theorem
+prover. (This is a component part of a larger effort to bring
+Proof-General to ACL2).
+
+* About
+** For ACL2 Users
+This does not provide a fully fledged environment such as ACL2s,
+rather it's a step-wise improvement on the current status quo of
+working with ACL2 (movement of plain-text between Emacs buffers). We
+inherent tab-completion, buffer-package awareness, an inspector, and
+many more niceties from Sly. You may think of this as an improved ACL2
+REPL.
+
+Please note that keyword-commands will only be processed by the REPL
+if you're in a package that ACL2 itself has defined (this is because
+we support the idea of working in a Lisp image that is used for more
+than just ACL2!). (NOTE: keyword-commands are not implemented just
+yet).
+
+** For CL Users
+You may be confused why a project written in Common Lisp needs special
+support to work properly with Sly. This is due to ACL2's architecture,
+necessitating an environment that passes around an implicit store,
+handles ACL2's IO, ACL2's conditions, and other things. Such an
+environment is provided by ACL2's own REPL, where all user interaction
+is intended to take place. The attempted use of any core ACL2 function
+outside of this environment results in a no-op. Thus we must have a
+way of evaluating these expressions inside of an ACL2 environment.
