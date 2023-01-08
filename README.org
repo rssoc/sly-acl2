@@ -9,21 +9,41 @@ This does not provide a fully fledged environment such as ACL2s,
 rather it's a step-wise improvement on the current status quo of
 working with ACL2 (movement of plain-text between Emacs buffers). We
 inherent tab-completion, buffer-package awareness, an inspector, and
-many more niceties from Sly. You may think of this as an improved ACL2
-REPL.
+many more niceties from Sly. You may think of this as an improved ~(ACL2::LP)~.
 
-Please note that keyword-commands will only be processed by the REPL
-if you're in a package that ACL2 itself has defined (this is because
-we support the idea of working in a Lisp image that is used for more
-than just ACL2!). (NOTE: keyword-commands are not implemented just
-yet).
+However, please note that keyword-commands will only be processed by
+the REPL if you're in a package that ACL2 itself has defined (this is
+because we support the idea of working in a Lisp image that is used
+for more than just ACL2!). (NOTE: keyword-commands are not implemented
+just yet).
 
 ** For CL Users
 You may be confused why a project written in Common Lisp needs special
 support to work properly with Sly. This is due to ACL2's architecture,
 necessitating an environment that passes around an implicit store,
-handles ACL2's IO, ACL2's conditions, and other things. Such an
-environment is provided by ACL2's own REPL, where all user interaction
-is intended to take place. The attempted use of any core ACL2 function
-outside of this environment results in a no-op. Thus we must have a
-way of evaluating these expressions inside of an ACL2 environment.
+handles ACL2's IO, ACL2's conditions, and other such things. This
+environment indented to be provided by ACL2's own REPL, where all user
+interaction is expected to take place. The attempted use of any core
+ACL2 function outside of this environment results in a no-op. Thus we
+must have a way of evaluating these expressions inside of an ACL2
+environment.
+
+* Installation
+Sly-acl2 is not yet on MELPA. If your Emacs installation uses
+use-package and straight.el, you can simply paste the following code
+into your init file.
+#+begin_src elisp
+(use-package sly-acl2
+  :straight
+  (sly-acl2 :flavor melpa
+            :files ("*.asd" "*.lisp" "*.el")
+            :type git :host github
+            :repo "rssoc/sly-acl2"))
+#+end_src
+Otherwise, in the meantime, you'll have to manually clone this repo
+and place it somewhere in your Emacs's load-path.
+
+* Usage
+This package is automatically activated when ACL2 is loaded in the
+common-lisp image. Therefore, it is a simple =M-x sly=, followed by
+=(ql:quickload :acl2)=.
