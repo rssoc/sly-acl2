@@ -3,5 +3,10 @@
 (defsystem :slynk-acl2
   :author "rssoc"
   :description "ACL2 support for Slynk."
-  :depends-on (:slynk :acl2)
-  :components ((:file "slynk-acl2")))
+  :depends-on (:slynk :slynk/mrepl)
+  :components ((:file "slynk-acl2"
+                :if-feature :acl2)))
+
+(defmethod perform :after (o (c (eql (find-system :acl2))))
+  (clear-system :slynk-acl2)
+  (load-system :slynk-acl2))

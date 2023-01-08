@@ -25,9 +25,6 @@
     (with-current-directory ((find-acl2-installation-directory))
       (let ((*real-standard-output* *standard-output*))
         (with-open-stream (*standard-output* (make-broadcast-stream))
-          (format
-           *real-standard-output*
-           "; Loading \"ACL2\"~%")
           (when (ql-impl-util:probe-directory #P"./books/quicklisp/bundle")
             (format *real-standard-output*
                 "~%WARNING: ACL2 bundles itself with outdated ASDF systems of popular ~
@@ -58,6 +55,5 @@
       nil)))
 
 (defsystem :acl2
-  :class :precompiled-system
   :description "ACL2 ASDF-system signature. (It's a dummy)."
-  :fasl #.(build-acl2-fasl))
+  :perform (load-op (o s) (build-acl2-fasl)))
