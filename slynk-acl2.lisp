@@ -1,4 +1,4 @@
-;;; slynk-acl2.lisp -- ACL2 support for SLYNK.
+;;; slynk-acl2.lisp -- ACL2 support for SLYNK. The CL side of things.
 ;;;
 ;;; How it works:
 ;;;
@@ -24,7 +24,6 @@
 ;;; more than expected, be assured it is the true return value of that
 ;;; function.
 ;;;
-
 (defpackage :slynk-acl2
   (:use :cl)
   (:shadow :eval :read :read-from-string))
@@ -32,7 +31,6 @@
 (in-package :slynk-acl2)
 
 
-
 ;; NOTE: We only respect these if they're at the top-level. This works
 ;; well for my purposes, but should I one day figure out (or need to) carve
 ;; them out of a greater ACL2 expression?
@@ -50,14 +48,13 @@ by the host lisp; no matter the context.")
 
 ;;; TODO: Figure out if I should be using ACL2::STATE or
 ;;; ACL2::*THE-LIVE-STATE*. (There's also ACL2::STATE-STATE)!
-
 (defun list-acl2-packages ()
   "Returns a list of packages defined in ACL2's namespace."
   (mapcar
    #'find-package
    (set-difference
     acl2::(strip-non-hidden-package-names
-           (known-package-alist state))
+           (known-package-alist *the-live-state*))
     ;; It's not the COMMON-LISP we know and... love? Like KEYWORD,
     ;; it's a pseudo-package that we must give special treatment to.
     '("COMMON-LISP" "KEYWORD")
@@ -99,7 +96,7 @@ by the host lisp; no matter the context.")
 (defun acl2-last-input-expression ()
   "Returns the last input expression sent to ACL2."
   acl2::(ld-history-entry-input
-         (first (ld-history state))))
+         (first (ld-history *the-live-state*))))
 
 (defun ensure-list (obj)
   "Coerce OBJ into a list by wrapping it in one (if necessary)."
@@ -113,7 +110,7 @@ by the host lisp; no matter the context.")
   (values-list
    (ensure-list
     acl2::(ld-history-entry-value
-           (first (ld-history state))))))
+           (first (ld-history *the-live-state*))))))
 
 
 (defun maybe-initialize-acl2 ()
