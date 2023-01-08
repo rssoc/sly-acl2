@@ -3,12 +3,11 @@
 ;;; How it works:
 ;;;
 ;;; Evaluating this file has the side-effect of shadowing EVAL, READ,
-;;; and READ-FROM-STRING, in the :SLYNK and :SLYNK/MREPL
+;;; and READ-FROM-STRING, in the :SLYNK and :SLYNK-MREPL
 ;;; packages. These functions behave identically to their COMMON-LISP
-;;; counterparts in, until we need to re-direct an ACL2 expression
-;;; into the carefully set-up evaluation environment that it expects
-;;; (and the entry point into that is provided by ACL2::LD-FN,
-;;; thanks!).
+;;; counterparts, until we need to re-direct an ACL2 expression into
+;;; the carefully set-up evaluation environment that it expects (and
+;;; the entry point this is provided by ACL2::LD-FN, thanks!).
 ;;;
 ;;; We determine at read-time whether a form should be interpreted by
 ;;; the host lisp, or by ACL2 (see `acl2-expression-p' for the
@@ -98,19 +97,11 @@ by the host lisp; no matter the context.")
   acl2::(ld-history-entry-input
          (first (ld-history *the-live-state*))))
 
-(defun ensure-list (obj)
-  "Coerce OBJ into a list by wrapping it in one (if necessary)."
-  (if (listp obj)
-      obj
-      (list obj)))
-
 ;; TODO: Study `acl2::ld-print-results' more.
 (defun acl2-last-return-value ()
   "Returns the last return value sent from ACL2."
-  (values-list
-   (ensure-list
-    acl2::(ld-history-entry-value
-           (first (ld-history *the-live-state*))))))
+  acl2::(ld-history-entry-value
+           (first (ld-history *the-live-state*))))
 
 
 (defun maybe-initialize-acl2 ()
