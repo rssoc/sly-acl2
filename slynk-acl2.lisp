@@ -128,6 +128,10 @@ by the host lisp; no matter the context.")
     (with-suppression
         (ld-fn
          `((standard-oi
+            ;; TODO: This is ugly for the keyword-command
+            ;; hack. Keyword-commands should be expanded at read-time,
+            ;; but I'm being lazy and letting ld-fn handle it. I need
+            ;; to study ACL2::LD-READ-COMMAND.
             . slynk-acl2::,(if (keywordp (car expression))
                                expression
                                (list expression)))
@@ -196,6 +200,13 @@ repeatably calling READ-LINE on it."
       (cl:eval original-exp)))
 
 
+;; Disable the proof-builder for now...
+(defun acl2::verify-fn (&rest _)
+  (declare (ignore _))
+  (error "SLYNK-ACL2 has disabled the PROOF-BUILDER because it breaks the
+REPL. It will be re-enabled sometime in the future with full
+SLYNK-MREPL support..."))
+
 ;; Install ourselves into the :slynk and :slynk-mrepl packages.
 (shadowing-import
  '(eval read read-from-string)
