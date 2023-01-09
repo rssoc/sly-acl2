@@ -1,49 +1,51 @@
-#+TITLE:  ACL2 support for Sly
-A Sly extension that adds support for the ACL2 automated theorem
-prover. (This is a component part of a larger effort to bring
-Proof-General to ACL2).
+This is a [[https://github.com/joaotavora/sly][SLY]] extension that adds evaluation support for the [[https://github.com/acl2/acl2][ACL2]]
+library (an automated theorem prover written in Common Lisp). This is
+a component of a larger effort to bring [[https://github.com/ProofGeneral/PG][ProofGeneral]] to ACL2.
 
 * About
 ** For ACL2 Users
-This does not provide a fully fledged environment such as ACL2s,
-rather it's a step-wise improvement on the current status quo of
-working with ACL2 (movement of plain-text between Emacs buffers). We
-inherent tab-completion, buffer-package awareness, an inspector, and
-many more niceties from Sly. You may think of this as an improved ~(ACL2::LP)~.
-
-However, please note that keyword-commands will only be processed by
-the REPL if you're in a package that ACL2 itself has defined (this is
-because we support the idea of working in a Lisp image that is used
-for more than just ACL2!). (NOTE: keyword-commands are not implemented
-just yet).
+This does not provide a fully fledged environment like ACL2s on its
+own, rather it's a step-wise improvement on the current status quo of
+working with ACL2 (movement of plain-text between Emacs buffers). It
+is an Emacs package that inherents tab-completion, buffer-package
+awareness, an inspector, and other niceties from SLY and the
+underlying Common Lisp system.
 
 ** For CL Users
-You may be confused why a project written in Common Lisp needs special
-support to work properly with Sly. This is due to ACL2's architecture,
-necessitating an environment that passes around an implicit store,
-handles ACL2's IO, ACL2's conditions, and other such things. This
-environment indented to be provided by ACL2's own REPL, where all user
-interaction is expected to take place. The attempted use of any core
-ACL2 function outside of this environment results in a no-op. Thus we
-must have a way of evaluating these expressions inside of an ACL2
-environment.
+You may be confused as to why a project written in Common Lisp needs
+special support to work properly with SLY. This is due to certain
+architectural choices that require ACL2 expressions to be evaluated in
+a carefully crafted context. Due to this, ACL2 provides it's own REPL
+where the user is expected to do development inside. In fact, the use
+of any [[https://www.cs.utexas.edu/users/moore/acl2/manuals/current/manual/?topic=ACL2____EVENTS][eventful]] ACL2 function (that doesn't have a CL counterpart)
+outside of this environment results in a no-op. Therefore, on a basic
+level, this SLY extension exists to transparently evaluate ACL2
+expressions in an ACL2 context.
 
 * Installation
-Sly-acl2 is not yet on MELPA. If your Emacs installation uses
-use-package and straight.el, you can simply paste the following code
-into your init file.
+While sly-acl2 is not yet on MELPA, if your Emacs installation uses
+[[https://github.com/jwiegley/use-package][use-package]] and [[https://github.com/radian-software/straight.el][straight.el]], you can get a quick-start by evaluating
+and putting the following in your init file (for persistence):
 #+begin_src elisp
 (use-package sly-acl2
   :straight
-  (sly-acl2 :flavor melpa
+  (SLY-acl2 :flavor melpa
             :files ("*.asd" "*.lisp" "*.el")
             :type git :host github
-            :repo "rssoc/sly-acl2"))
+            :repo "rssoc/SLY-acl2"))
 #+end_src
 Otherwise, in the meantime, you'll have to manually clone this repo
 and place it somewhere in your Emacs's load-path.
 
 * Usage
 This package is automatically activated when ACL2 is loaded in the
-common-lisp image. Therefore, it is a simple =M-x sly=, followed by
-=(ql:quickload :acl2)=.
+Common Lisp image. In other words, to get started quickly, after
+you've started a Common Lisp repl with =M-x sly= in Emacs, issue
+=(ql:quicklisp :acl2)=. Note that if you've loaded this package with
+SLY already running, simply issue =M-x sly-setup= for the current
+session to become aware of this extension.
+
+A final note that keyword-commands will only be processed by the REPL
+if you're in a package that ACL2 knows about (this is because we
+support the idea of working in a Lisp image that is used for more than
+just ACL2! So we like to be careful).
