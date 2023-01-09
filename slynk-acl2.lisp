@@ -75,8 +75,12 @@ by the host lisp; no matter the context.")
         ;; (if a COMMON-LISP symbol was explicitly qualified as an
         ;; ACL2 symbol, keep it as such).
         (and (acl2-package? *package*)
-             (eq (symbol-package symbol)
-                 (find-package "COMMON-LISP"))))))
+             (or (eq (symbol-package symbol)
+                     (find-package "COMMON-LISP"))
+                 ;; If we're in an ACL2 package, enable the
+                 ;; keyword-command hack.
+                 (eq (symbol-package symbol)
+                     (find-package "KEYWORD")))))))
 
 ;;; TODO: This is basic... Or is it? Do I really want to start mixing
 ;;; CL and ACL2 expressions together? Would this functionality be left
@@ -123,7 +127,10 @@ by the host lisp; no matter the context.")
     ;; WITH-SUPPRESSION macro as in ACL2::LP.
     (with-suppression
         (ld-fn
-         `((standard-oi . (,slynk-acl2::expression))
+         `((standard-oi
+            . slynk-acl2::,(if (keywordp (car expression))
+                               expression
+                               (list expression)))
            (ld-prompt . nil)
            (ld-verbose . nil)
            (ld-error-triples . t)
@@ -136,8 +143,16 @@ by the host lisp; no matter the context.")
 (defun read-string-as-acl2 (string &rest reader-options)
   "Reads STRING in as an ACL2 object. READER-OPTIONS are that of
  READ-FROM-STRING."
-  (let ((*readtable* acl2::*acl2-readtable*))
-    (apply #'cl:read-from-string string reader-options)))
+  (let ((*readtable* acl2::*acl2-readtable*)
+        (eof-value (cadr reader-options)))
+    (let ((acl2-object (apply #'cl:read-from-string string reader-options)))
+      (if (and (keywordp acl2-object)
+               (not (equal acl2-object eof-value)))
+          (list acl2-object
+                (apply #'read-string-as-acl2
+                       (apply #'concatenate 'string (cdr (uiop:split-string string)))
+                       reader-options))
+          acl2-object))))
 
 
 (defun stream-to-string (stream)
