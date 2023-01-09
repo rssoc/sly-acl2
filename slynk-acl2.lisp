@@ -127,14 +127,7 @@ by the host lisp; no matter the context.")
     ;; WITH-SUPPRESSION macro as in ACL2::LP.
     (with-suppression
         (ld-fn
-         `((standard-oi
-            ;; TODO: This is ugly for the keyword-command
-            ;; hack. Keyword-commands should be expanded at read-time,
-            ;; but I'm being lazy and letting ld-fn handle it. I need
-            ;; to study ACL2::LD-READ-COMMAND.
-            . slynk-acl2::,(if (keywordp (car expression))
-                               expression
-                               (list expression)))
+         `((standard-oi . (,slynk-acl2::expression))
            (ld-prompt . nil)
            (ld-verbose . nil)
            (ld-error-triples . t)
@@ -147,16 +140,8 @@ by the host lisp; no matter the context.")
 (defun read-string-as-acl2 (string &rest reader-options)
   "Reads STRING in as an ACL2 object. READER-OPTIONS are that of
  READ-FROM-STRING."
-  (let ((*readtable* acl2::*acl2-readtable*)
-        (eof-value (cadr reader-options)))
-    (let ((acl2-object (apply #'cl:read-from-string string reader-options)))
-      (if (and (keywordp acl2-object)
-               (not (equal acl2-object eof-value)))
-          (list acl2-object
-                (apply #'read-string-as-acl2
-                       (apply #'concatenate 'string (cdr (uiop:split-string string)))
-                       reader-options))
-          acl2-object))))
+  (let ((*readtable* acl2::*acl2-readtable*))
+    (apply #'cl:read-from-string string reader-options)))
 
 
 (defun stream-to-string (stream)
