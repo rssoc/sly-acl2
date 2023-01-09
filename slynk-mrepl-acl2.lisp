@@ -5,16 +5,18 @@
 ;;; This file provides additional support for the SLYNK-MREPL. We
 ;;; enable the use of ACL2 keyword-commands here, as well as support
 ;;; for SLYNK-MREPLs's backreference reader syntax. This file is
-;;; expected to be loaded after SLYNK-ACL2.lisp.
+;;; expected to be loaded after SLYNK-ACL2.lisp. It's an ugly one as
+;;; it directly redefines some chunks of SLYNK-MREPL and inlines some
+;;; functions from SLYNK-ACL2. This is clearly isn't desirable, so
+;;; expect this file to be depreciated in the future.
 ;;;
 (in-package :slynk-mrepl)
 
 
-
 ;;; NOTE: The easiest way to get back-references working is to
 ;;; mrepl-get-object-from-history at read-time. Is there a reason why
 ;;; the backreference-reader doesn't already do this? (I can't think
-;;; of a reason).
+;;; of one). Keep in sync with SLYNK-MREPL::BACKREFERENCE-READER.
 (defun backreference-reader (stream subchar arg)
   "Reads #rfoo:bar into (MREPL-GET-OBJECT-FROM-HISTORY foo bar)."
   (declare (ignore subchar arg))
@@ -37,9 +39,9 @@
     (mrepl-get-object-from-history
      entry-idx value-idx)))
 
-;;; NOTE: keep this in sync with SLYNK-MREPL::MREPL-EVAL-1 and
-;;; SLYNK-ACL2::READ-STRING-AS-ACL2. AFAIK, this sort of redefinition
-;;; is unavoidable.
+;;; NOTE: Keep in sync with SLYNK-MREPL::MREPL-EVAL-1,
+;;; SLYNK-ACL2::READ-STRING-AS-ACL2, and
+;;; SLYNK-ACL2::EVAL-IN-ACL2.
 (defun mrepl-eval-1 (repl string)
   "In REPL's environment, READ and EVAL forms in STRING."
   (with-sly-interrupts
