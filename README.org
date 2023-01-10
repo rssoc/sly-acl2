@@ -1,3 +1,5 @@
+#+TITLE: SLY-ACL2: ACL2 support for SLY
+
 This is a [[https://github.com/joaotavora/sly][SLY]] extension that adds evaluation support for the [[https://github.com/acl2/acl2][ACL2]]
 library (an automated theorem prover written in Common Lisp). This is
 a component of a larger effort to bring [[https://github.com/ProofGeneral/PG][ProofGeneral]] to ACL2.
@@ -23,29 +25,43 @@ level, this SLY extension exists to transparently evaluate ACL2
 expressions in an ACL2 context.
 
 * Installation
-While sly-acl2 is not yet on MELPA, if your Emacs installation uses
-[[https://github.com/jwiegley/use-package][use-package]] and [[https://github.com/radian-software/straight.el][straight.el]], you can get a quick-start by evaluating
-and putting the following in your init file (for persistence):
+** ACL2
+While ACL2 is not yet on Quicklisp, nor has an ASDF definition, it's
+recommended for you to manually clone [[https://github.com/acl2/acl2][ACL2]] (or download the [[https://github.com/acl2-devel/acl2-devel/releases/latest][latest
+ACL2 release]]) to your =ql:*local-project-directories*= so you can
+use the ASDF system we bundle for convenience. Otherwise, you'll have
+to manually go through [[https://www.cs.utexas.edu/users/moore/acl2/v8-5/HTML/installation/obtaining-and-installing.html#Running][the steps of loading ACL2]] into your image, and
+enable this package manually (see *Usage*).
+
+** SLY-ACL2
+While =sly-acl2= is not yet on MELPA, if your Emacs installation uses
+[[https://github.com/jwiegley/use-package][use-package]] and [[https://github.com/radian-software/straight.el][straight.el]], you can get a quick-start by evaluating,
+and putting the following form in your init file:
 #+begin_src elisp
 (use-package sly-acl2
   :straight
-  (SLY-acl2 :flavor melpa
+  (sly-acl2 :flavor melpa
             :files ("*.asd" "*.lisp" "*.el")
             :type git :host github
-            :repo "rssoc/SLY-acl2"))
+            :repo "rssoc/sly-acl2"))
 #+end_src
 Otherwise, in the meantime, you'll have to manually clone this repo
 and place it somewhere in your Emacs's load-path.
 
 * Usage
-This package is automatically activated when ACL2 is loaded in the
+If you installed ACL2 into your =ql:*local-project-directories*=, then
+this package is automatically activated when ACL2 is loaded in the
 Common Lisp image. In other words, to get started quickly, after
-you've started a Common Lisp repl with =M-x sly= in Emacs, issue
-=(ql:quicklisp :acl2)=. Note that if you've loaded this package with
+you've started a Common Lisp repl with =M-x sly=, issue
+=(ql:quicklisp:acl2)=. Note that if you've loaded this package with
 SLY already running, simply issue =M-x sly-setup= for the current
 session to become aware of this extension.
+
+However, if ACL2 was not installed into your
+=ql:*local-project-directories*=, then after [[https://www.cs.utexas.edu/users/moore/acl2/v8-5/HTML/installation/obtaining-and-installing.html#Running][loading ACL2 manually]],
+issue a =(ql:quickload :slynk-acl2)=.
 
 A final note that keyword-commands will only be processed by the REPL
 if you're in a package that ACL2 knows about (this is because we
 support the idea of working in a Lisp image that is used for more than
-just ACL2! So we like to be careful).
+just ACL2!).
