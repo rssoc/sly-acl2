@@ -9,6 +9,7 @@
                (:file "slynk-mrepl-acl2"
                 :if-feature :acl2)))
 
+;; Hook ourselves to auto-load after ACL2.
 (defmethod perform :after (o (c (eql (find-system :acl2))))
-  (clear-system :slynk-acl2)
-  (load-system :slynk-acl2))
+ (clear-system :slynk-acl2)
+ (load-system :slynk-acl2))

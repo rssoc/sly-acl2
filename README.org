@@ -1,41 +1,41 @@
 #+TITLE: SLY-ACL2: ACL2 support for SLY
 
-This is a [[https://github.com/joaotavora/sly][SLY]] extension that adds evaluation support for the [[https://github.com/acl2/acl2][ACL2]]
-library (an automated theorem prover written in Common Lisp). This is
-a component of a larger effort to bring [[https://github.com/ProofGeneral/PG][ProofGeneral]] to ACL2.
+This is a [[https://github.com/joaotavora/sly][SLY]] extension that adds evaluation support for [[https://github.com/acl2/acl2][ACL2]], an
+automated theorem prover written in Common Lisp. This is part of a
+larger effort bringing [[https://github.com/ProofGeneral/PG][ProofGeneral]] to ACL2.
 
 * About
 ** For ACL2 Users
-This does not provide a fully fledged environment like ACL2s on its
-own, rather it's a step-wise improvement on the current status quo of
-working with ACL2 (movement of plain-text between Emacs buffers). It
-is an Emacs package that inherents tab-completion, buffer-package
-awareness, an inspector, and other niceties from SLY and the
-underlying Common Lisp system.
+This does not provide a fully fledged environment like ACL2s, rather
+it's a step-wise improvement on the more "traditional" ACL2 workflow
+(movement of plain-text between Emacs buffers). It is an Emacs package
+that brings tab-completion, buffer-package awareness, an inspector,
+and other niceties from the underlying Common Lisp environment, to
+ACL2.
 
 ** For CL Users
-You may be confused as to why a project written in Common Lisp needs
-special support to work properly with SLY. This is due to certain
-architectural choices that require ACL2 expressions to be evaluated in
-a carefully crafted context. Due to this, ACL2 provides it's own REPL
-where the user is expected to do development inside. In fact, the use
+You may be wondering why a project written in Common Lisp needs
+special support to work properly with SLY. Certain architectural
+decisions made in ACL2 require ACL2 expressions to be evaluated in a
+carefully crafted context; for this, ACL2 actually provides it's own
+REPL where the user is expected to do development in. In fact, the use
 of any [[https://www.cs.utexas.edu/users/moore/acl2/manuals/current/manual/?topic=ACL2____EVENTS][eventful]] ACL2 function (that doesn't have a CL counterpart)
-outside of this environment results in a no-op. Therefore, on a basic
-level, this SLY extension exists to transparently evaluate ACL2
-expressions in an ACL2 context.
+outside of this environment results in a no-op. Therefore this SLY
+extension exists to transparently evaluate ACL2 expressions in an ACL2
+context.
 
 * Installation
 ** ACL2
-While ACL2 is not yet on Quicklisp, nor has an ASDF definition, it's
-recommended for you to manually clone [[https://github.com/acl2/acl2][ACL2]] (or download the [[https://github.com/acl2-devel/acl2-devel/releases/latest][latest
-ACL2 release]]) to your =ql:*local-project-directories*= so you can
-use the ASDF system we bundle for convenience. Otherwise, you'll have
-to manually go through [[https://www.cs.utexas.edu/users/moore/acl2/v8-5/HTML/installation/obtaining-and-installing.html#Running][the steps of loading ACL2]] into your image, and
-enable this package manually (see *Usage*).
+ACL2 is not (yet) on Quicklisp, nor has an ASDF definition. It's
+recommended to manually clone [[https://github.com/acl2/acl2][ACL2]] (or download the [[https://github.com/acl2-devel/acl2-devel/releases/latest][latest ACL2
+release]]) to your =ql:*local-project-directories*= because of the
+ASDF system we bundled for convenience. Otherwise, you'll have to go
+through [[https://www.cs.utexas.edu/users/moore/acl2/v8-5/HTML/installation/obtaining-and-installing.html#Running][the steps of manually loading ACL2]] into your image, and enable
+this package manually (see *Usage*).
 
 ** SLY-ACL2
-While =sly-acl2= is not yet on MELPA, if your Emacs installation uses
-[[https://github.com/jwiegley/use-package][use-package]] and [[https://github.com/radian-software/straight.el][straight.el]], you can get a quick-start by evaluating,
+=sly-acl2= is not on MELPA, but if your Emacs installation features
+[[https://github.com/jwiegley/use-package][use-package]] and [[https://github.com/radian-software/straight.el][straight.el]], you can get a quick-start by evaluating
 and putting the following form in your init file:
 #+begin_src elisp
 (use-package sly-acl2
@@ -45,23 +45,24 @@ and putting the following form in your init file:
             :type git :host github
             :repo "rssoc/sly-acl2"))
 #+end_src
-Otherwise, in the meantime, you'll have to manually clone this repo
-and place it somewhere in your Emacs's load-path.
+Otherwise, you'll have to manually clone this repo and place it
+somewhere in your Emacs's load-path.
 
 * Usage
 If you installed ACL2 into your =ql:*local-project-directories*=, then
 this package is automatically activated when ACL2 is loaded in the
-Common Lisp image. In other words, to get started quickly, after
-you've started a Common Lisp repl with =M-x sly=, issue
-=(ql:quicklisp:acl2)=. Note that if you've loaded this package with
-SLY already running, simply issue =M-x sly-setup= for the current
-session to become aware of this extension.
+Common Lisp image. Therefore, to get started, once you've opened a
+Common Lisp repl with =M-x sly=, run =(ql:quicklisp:acl2)=. Be aware
+that if you installed this extension with SLY already running, you'll
+need to =M-x sly-setup= first for the current session to become aware
+of the extension.
 
 However, if ACL2 was not installed into your
 =ql:*local-project-directories*=, then after [[https://www.cs.utexas.edu/users/moore/acl2/v8-5/HTML/installation/obtaining-and-installing.html#Running][loading ACL2 manually]],
-issue a =(ql:quickload :slynk-acl2)=.
+you'll have to manually load the Common Lisp side of the extension
+with =(ql:quickload :slynk-acl2)=.
 
-A final note that keyword-commands will only be processed by the REPL
-if you're in a package that ACL2 knows about (this is because we
+A final note that [[https://www.cs.utexas.edu/users/moore/acl2/manuals/current/manual/?topic=ACL2____KEYWORD-COMMANDS][keyword-commands]] will only be processed by the REPL
+if you're in a package that ACL2 knows about. This is because we
 support the idea of working in a Lisp image that is used for more than
-just ACL2!).
+just ACL2!
